@@ -1,0 +1,146 @@
+Given a string S. The task is to count the non-overlapping pairs of palindromic sub-strings S1 and S2 such that the strings should be S1[L1…R1] and S2[L2…R2] where 0 ≤ L1 ≤ R1 < L2 ≤ R2 < N. The task is to count the number of pairs of the non-overlapping palindromic sub-strings.
+
+Examples:
+
+Input: s = “aaa”
+Output: 5
+All possible pairs are (s[0], s[1]), (s[0], s[2]),
+(s[0], s[1, 2]), (s[1], s[2]) and (s[0, 1], s[2])
+
+Input: s = “abacaba”
+Output: 36
+
+Recommended: Please try your approach on {IDE} first, before moving on to the solution.
+Approach: We can use Dynamic Programming to solve the above problem. We can initially create the DP table which stores if substring[i….j] is palindrome or not. We maintain a boolean dp[n][n] that is filled in a bottom-up manner. The value of dp[i][j] is true if the substring is a palindrome, otherwise false. To calculate dp[i][j], we first check the value of dp[i+1][j-1], if the value is true and s[i] is same as s[j], then we make dp[i][j] true. Otherwise, the value of dp[i][j] is made false. The following steps can be followed thereafter to get the number of pairs.
+
+Create a left[] array, where left[i] stores the count of the number of palindromes to the left on the index i including i.
+Create a right[] array, where right[i] stores the count of the number of palindromes to the right on the index i including i.
+Iterate from 0 to length-1 and add left[i]*right[i+1]. The summation of it for every index will be the required number of pairs.
+Below is the implementation of the above approach:
+
+
+// Java implementation of the approach
+class GFG
+{
+  
+    static int N = 100;
+  
+    // Pre-processing function
+    static void pre_process(boolean dp[][], char[] s)
+    {
+  
+        // Get the size of the string
+        int n = s.length;
+  
+        // Initially mark every
+        // position as false
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                dp[i][j] = false;
+            }
+        }
+  
+        // For the length
+        for (int j = 1; j <= n; j++)
+        {
+  
+            // Iterate for every index with
+            // length j
+            for (int i = 0; i <= n - j; i++)
+            {
+  
+                // If the length is less than 2
+                if (j <= 2) 
+                {
+  
+                    // If characters are equal
+                    if (s[i] == s[i + j - 1])
+                    {
+                        dp[i][i + j - 1] = true;
+                    }
+                } 
+                // Check for equal
+                else if (s[i] == s[i + j - 1])
+                {
+                    dp[i][i + j - 1] = dp[i + 1][i + j - 2];
+                }
+            }
+        }
+    }
+  
+    // Function to return the number of pairs
+    static int countPairs(String s)
+    {
+  
+        // Create the dp table initially
+        boolean dp[][] = new boolean[N][N];
+        pre_process(dp, s.toCharArray());
+        int n = s.length();
+  
+        // Declare the left array
+        int left[] = new int[n];
+  
+        // Declare the right array
+        int right[] = new int[n];
+  
+        // Initially left[0] is 1
+        left[0] = 1;
+  
+        // Count the number of palindrome
+        // pairs to the left
+        for (int i = 1; i < n; i++)
+        {
+  
+            for (int j = 0; j <= i; j++) 
+            {
+  
+                if (dp[j][i] == true)
+                {
+                    left[i]++;
+                }
+            }
+        }
+  
+        // Initially right most as 1
+        right[n - 1] = 1;
+  
+        // Count the number of palindrome
+        // pairs to the right
+        for (int i = n - 2; i >= 0; i--)
+        {
+  
+            right[i] = right[i + 1];
+  
+            for (int j = n - 1; j >= i; j--)
+            {
+  
+                if (dp[i][j] == true)
+                {
+                    right[i]++;
+                }
+            }
+        }
+  
+        int ans = 0;
+  
+        // Count the number of pairs
+        for (int i = 0; i < n - 1; i++)
+        {
+            ans += left[i] * right[i + 1];
+        }
+  
+        return ans;
+    }
+  
+    // Driver code
+    public static void main(String[] args) 
+    {
+        String s = "abacaba";
+        System.out.println(countPairs(s));
+    }
+}
+ 
+//  Output:  36
+
